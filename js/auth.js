@@ -5,32 +5,28 @@ import { $ } from "./helpers.js";
 
 let mode = "signin"; // "signin" or "signup"
 let submitting = false;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // a simple "name@site.com" check; the server checks it again
 
-// The looping background video plays on the sign in / sign up screen only.
-function playAuthVideo(play) {
+// The background video only plays while the sign in screen is showing.
+function playBackgroundVideo(shouldPlay) {
   const video = $("#auth-video");
   if (!video) return;
-  video.muted = true; // phones only allow autoplay when muted
-  if (play) {
-    const started = video.play();
-    if (started && started.catch) started.catch(() => {});
-  } else {
-    video.pause();
-  }
+  if (shouldPlay) video.play().catch(() => {}); // a blocked or missing video is fine: the plain background shows
+  else video.pause();
 }
 
 export function showAuthScreen() {
-  document.documentElement.setAttribute("data-screen", "auth"); // no wood wallpaper here
+  document.documentElement.setAttribute("data-screen", "auth"); // no wood wallpaper on this screen
   $("#app").classList.add("hidden");
   $("#auth-screen").classList.remove("hidden");
-  playAuthVideo(true);
+  playBackgroundVideo(true);
 }
 
 export function showAppScreen() {
   document.documentElement.setAttribute("data-screen", "app");
   $("#auth-screen").classList.add("hidden");
   $("#app").classList.remove("hidden");
-  playAuthVideo(false);
+  playBackgroundVideo(false);
 }
 
 function setMessage(text, isGood = false) {
@@ -49,6 +45,10 @@ function setMode(nextMode) {
   $("#auth-toggle").textContent = signingIn ? "New here? Create an account" : "Already have an account? Sign in";
   $("#auth-password").setAttribute("autocomplete", signingIn ? "current-password" : "new-password");
   $("#auth-password").setAttribute("placeholder", signingIn ? "Your password" : "At least 6 characters");
+  $("#auth-confirm-field").classList.toggle("hidden", signingIn);
+  $("#auth-hint").classList.toggle("hidden", signingIn);
+  $("#auth-terms").classList.toggle("hidden", signingIn);
+  $("#auth-confirm").value = "";
   setMessage("");
 }
 
@@ -58,13 +58,26 @@ async function submit(event) {
 
   const email = $("#auth-email").value.trim();
   const password = $("#auth-password").value;
-  if (!email || password.length < 6) {
-    setMessage("Enter a valid email and a password of at least 6 characters.");
+  if (!EMAIL_PATTERN.test(email)) {
+    setMessage("Enter a valid email address.");
+    $("#auth-email").focus();
+    return;
+  }
+  if (password.length < 6) {
+    setMessage("Your password needs at least 6 characters.");
+    $("#auth-password").focus();
+    return;
+  }
+  if (mode === "signup" && $("#auth-confirm").value !== password) {
+    setMessage("The two passwords don't match.");
+    $("#auth-confirm").focus();
     return;
   }
 
   submitting = true;
-  $("#auth-submit").disabled = true;
+  const submitButton = $("#auth-submit");
+  submitButton.disabled = true;
+  submitButton.textContent = mode === "signup" ? "Creating account…" : "Signing in…";
   setMessage("");
 
   try {
@@ -81,7 +94,8 @@ async function submit(event) {
     setMessage("Something went wrong. Please try again.");
   } finally {
     submitting = false;
-    $("#auth-submit").disabled = false;
+    submitButton.disabled = false;
+    submitButton.textContent = mode === "signup" ? "Create account" : "Sign in";
   }
 }
 
@@ -105,12 +119,14 @@ export function bindAuth() {
   $("#auth-form").addEventListener("submit", submit);
   $("#auth-toggle").addEventListener("click", () => setMode(mode === "signin" ? "signup" : "signin"));
 
-  // Show / hide password
+  // Show / hide password (also reveals the "confirm" box when it is on screen)
   const passwordInput = $("#auth-password");
+  const confirmInput = $("#auth-confirm");
   const toggle = $("#auth-password-toggle");
   toggle.addEventListener("click", () => {
     const show = passwordInput.type === "password";
     passwordInput.type = show ? "text" : "password";
+    confirmInput.type = show ? "text" : "password";
     toggle.classList.toggle("showing", show);
     toggle.setAttribute("aria-pressed", String(show));
     toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");

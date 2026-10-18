@@ -28,13 +28,6 @@ function isTouchScreen() {
   return Boolean(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
 }
 
-// Keyboard height from the VirtualKeyboard API (0 when the browser does not have it).
-function readKeyboardApiHeight() {
-  const keyboardApi = navigator.virtualKeyboard;
-  if (!keyboardApi || !keyboardApi.boundingRect) return 0;
-  return Math.max(0, Math.round(keyboardApi.boundingRect.height));
-}
-
 function update() {
   const viewport = window.visualViewport;
   const innerHeight = window.innerHeight;
@@ -47,11 +40,8 @@ function update() {
   lastWidth = window.innerWidth;
 
   const visibleBottom = viewport ? viewport.height + viewport.offsetTop : innerHeight;
-  const coveredByViewport = Math.max(0, Math.round(fullHeight - visibleBottom));
-  // Chrome on Android (with "overlays-content") keeps the page full height, so the viewport never
-  // shrinks. Its VirtualKeyboard API tells us the keyboard height directly.
-  const coveredByKeyboardApi = readKeyboardApiHeight();
-  const covered = Math.max(coveredByViewport, coveredByKeyboardApi);
+  // The visible part of the screen shrinks when the keyboard opens; the difference is the keyboard.
+  const covered = Math.max(0, Math.round(fullHeight - visibleBottom));
   const keyboard = isTouchScreen() && isTyping() && covered >= MIN_KEYBOARD_PX ? covered : 0;
   const top = viewport ? Math.round(viewport.offsetTop) : 0;
 
@@ -78,10 +68,6 @@ function showFocusedField(event) {
 }
 
 export function bindKeyboard() {
-  if (navigator.virtualKeyboard) {
-    navigator.virtualKeyboard.overlaysContent = true; // the keyboard covers the page; we lift the input ourselves
-    navigator.virtualKeyboard.addEventListener("geometrychange", update);
-  }
   update();
   window.addEventListener("resize", update);
   window.addEventListener("orientationchange", () => setTimeout(update, 300));

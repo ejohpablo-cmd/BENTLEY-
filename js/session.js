@@ -22,6 +22,7 @@ function clearSignedOutState() {
   state.settings = { ...DEFAULT_SETTINGS };
   state.connections = [];
   $("#auth-password").value = "";
+  $("#auth-confirm").value = "";
 }
 
 export async function handleSession(session) {
