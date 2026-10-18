@@ -1,4 +1,4 @@
-// Bentley starts here. This file only connects the pieces; the real work lives in js/.
+// Axelvon starts here. This file only connects the pieces; the real work lives in js/.
 //
 //   js/chat.js        the Chat page (messages, send, stop, edit, greeting)
 //   js/typewriter.js  writes new replies out letter by letter
@@ -13,7 +13,7 @@
 //   js/keyboard.js    keeps the on-screen keyboard overlaying the app
 //   js/share.js       the share sheet
 //   js/api.js         Supabase: login, the Edge Functions, photo storage
-//   js/markdown.js    turns Bentley's markdown into safe HTML
+//   js/markdown.js    turns Axelvon's markdown into safe HTML
 
 import { $ } from "./js/helpers.js";
 import { supabase } from "./js/api.js";
@@ -43,7 +43,7 @@ function bindOverlays() {
 
 async function init() {
   // The logos written in index.html also fall back to a "B" badge if benny.png is missing.
-  document.querySelectorAll("img.bentley-img").forEach(attachFallback);
+  document.querySelectorAll("img.axelvon-img").forEach(attachFallback);
 
   bindAuth();
   bindNavigation();

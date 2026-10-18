@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=overlays-content">
   <meta name="theme-color" content="#FAF7FF">
   <meta name="color-scheme" content="light dark">
-  <title>Bentley</title>
+  <title>Axelvon</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..600&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script src="theme-init.js"></script>
 </head>
@@ -23,12 +23,12 @@
 
   <!-- Sign in / create account -->
   <main id="auth-screen" class="auth hidden">
-    <video id="auth-video" class="auth-video" src="video.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true" tabindex="-1"></video>
-    <div class="auth-scrim" aria-hidden="true"></div>
+    <!-- Your looping background video: add a file named video.mp4 next to this page -->
+    <video id="auth-video" class="auth-video" src="video.mp4" autoplay muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
     <div class="auth-card">
-      <img class="avatar bentley-img lg" src="benny.png" alt="Bentley" width="96" height="96">
-      <h1 class="auth-title">Bentley</h1>
-      <p class="muted" id="auth-subtitle">Sign in to talk to Bentley</p>
+      <img class="avatar axelvon-img lg" src="benny.png" alt="Axelvon" width="96" height="96">
+      <h1 class="auth-title">Axelvon</h1>
+      <p class="muted" id="auth-subtitle">Sign in to talk to Axelvon</p>
 
       <button class="btn google-btn" id="google-btn" type="button">
         <svg viewBox="0 0 48 48" width="22" height="22" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.5 5.8c4.4-4.1 7.1-10.1 7.1-17.5z"/><path fill="#FBBC05" d="M10.5 28.7a14.5 14.5 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.4 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
@@ -39,21 +39,11 @@
       <form id="auth-form" class="auth-form">
         <label class="field">
           <span>Email</span>
-          <div class="input-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7.5 8 6 8-6"/></svg>
-            <input id="auth-email" type="email" inputmode="email" placeholder="you@example.com" autocomplete="email" autocapitalize="none" spellcheck="false" required>
-          </div>
+          <input id="auth-email" type="email" autocomplete="email" required>
         </label>
         <label class="field">
           <span>Password</span>
-          <div class="input-wrap">
-            <svg class="input-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg>
-            <input id="auth-password" type="password" placeholder="At least 6 characters" autocomplete="current-password" minlength="6" required>
-            <button class="input-toggle" id="auth-password-toggle" type="button" aria-label="Show password" aria-pressed="false">
-              <svg class="eye-on" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
-              <svg class="eye-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6C3.8 8.5 2 12 2 12s3.6 7 10 7c1.7 0 3.2-.4 4.5-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
-            </button>
-          </div>
+          <input id="auth-password" type="password" autocomplete="current-password" minlength="6" required>
         </label>
         <p id="auth-message" class="auth-message" role="alert"></p>
         <button class="btn" id="auth-submit" type="submit">Sign in</button>
@@ -68,9 +58,9 @@
     <section id="page-chat" class="page active" aria-label="Chat">
       <header class="topbar">
         <div class="topbar-id">
-          <img class="avatar bentley-img sm" src="benny.png" alt="Bentley" width="40" height="40">
+          <img class="avatar axelvon-img sm" src="benny.png" alt="Axelvon" width="40" height="40">
           <div>
-            <h1 class="topbar-title">Bentley</h1>
+            <h1 class="topbar-title">Axelvon</h1>
             <p class="status"><span class="status-dot"></span>Your Lovely Angel</p>
           </div>
         </div>
@@ -81,9 +71,9 @@
 
       <div id="messages" class="messages" role="log" aria-live="polite"></div>
 
-      <!-- Shown while Bentley is resting after the limit was reached -->
+      <!-- Shown while Axelvon is resting after the limit was reached -->
       <div id="rest-banner" class="rest-banner hidden" role="status">
-        <strong>Bentley is resting</strong>
+        <strong>Axelvon is resting</strong>
         <span>You can chat again in <b id="rest-timer">01:30:00</b></span>
       </div>
 
@@ -101,7 +91,7 @@
           <button type="button" id="attach-btn" class="attach-btn" aria-label="Add a photo">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
           </button>
-          <textarea id="chat-input" rows="1" placeholder="Talk to Bentley" maxlength="4000" aria-label="Message Bentley"></textarea>
+          <textarea id="chat-input" rows="1" placeholder="Talk to Axelvon" maxlength="4000" aria-label="Message Axelvon"></textarea>
         </div>
         <button type="submit" id="send-btn" class="send-btn" aria-label="Send message" disabled>
           <svg id="send-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
@@ -174,8 +164,8 @@
   <!-- App lock screen (only used when App lock is turned on in Settings) -->
   <div id="lock-screen" class="lock hidden" role="dialog" aria-modal="true" aria-label="App locked">
     <div class="lock-card">
-      <img class="avatar bentley-img lg" src="benny.png" alt="Bentley" width="96" height="96">
-      <h2 class="lock-title">Bentley is locked</h2>
+      <img class="avatar axelvon-img lg" src="benny.png" alt="Axelvon" width="96" height="96">
+      <h2 class="lock-title">Axelvon is locked</h2>
       <p class="muted" id="lock-hint">Enter your PIN</p>
       <form id="lock-form" class="lock-form">
         <input id="lock-pin" class="pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" aria-label="PIN">

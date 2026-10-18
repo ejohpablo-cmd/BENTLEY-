@@ -12,7 +12,7 @@
     root.setAttribute("data-bubble", localStorage.getItem("bentley_bubble") || "rounded");
 
     const themeColor = document.querySelector('meta[name="theme-color"]');
-    if (themeColor) themeColor.setAttribute("content", theme === "dark" ? "#130F22" : "#FAF7FF");
+    if (themeColor) themeColor.setAttribute("content", theme === "dark" ? "#120D24" : "#FAF7FF");
   } catch (error) {
     // Storage is unavailable: keep the defaults written in index.html.
   }
