@@ -6,26 +6,31 @@ import { $ } from "./helpers.js";
 let mode = "signin"; // "signin" or "signup"
 let submitting = false;
 
-// The background video only plays while the sign in screen is showing.
-function playBackgroundVideo(shouldPlay) {
+// The looping background video plays on the sign in / sign up screen only.
+function playAuthVideo(play) {
   const video = $("#auth-video");
   if (!video) return;
-  if (shouldPlay) video.play().catch(() => {}); // a blocked or missing video is fine: the plain background shows
-  else video.pause();
+  video.muted = true; // phones only allow autoplay when muted
+  if (play) {
+    const started = video.play();
+    if (started && started.catch) started.catch(() => {});
+  } else {
+    video.pause();
+  }
 }
 
 export function showAuthScreen() {
-  document.documentElement.setAttribute("data-screen", "auth"); // no wood wallpaper on this screen
+  document.documentElement.setAttribute("data-screen", "auth"); // no wood wallpaper here
   $("#app").classList.add("hidden");
   $("#auth-screen").classList.remove("hidden");
-  playBackgroundVideo(true);
+  playAuthVideo(true);
 }
 
 export function showAppScreen() {
   document.documentElement.setAttribute("data-screen", "app");
   $("#auth-screen").classList.add("hidden");
   $("#app").classList.remove("hidden");
-  playBackgroundVideo(false);
+  playAuthVideo(false);
 }
 
 function setMessage(text, isGood = false) {
@@ -43,6 +48,7 @@ function setMode(nextMode) {
   $("#google-btn-label").textContent = signingIn ? "Continue with Google" : "Sign up with Google";
   $("#auth-toggle").textContent = signingIn ? "New here? Create an account" : "Already have an account? Sign in";
   $("#auth-password").setAttribute("autocomplete", signingIn ? "current-password" : "new-password");
+  $("#auth-password").setAttribute("placeholder", signingIn ? "Your password" : "At least 6 characters");
   setMessage("");
 }
 
@@ -98,4 +104,16 @@ export function bindAuth() {
   $("#google-btn").addEventListener("click", continueWithGoogle);
   $("#auth-form").addEventListener("submit", submit);
   $("#auth-toggle").addEventListener("click", () => setMode(mode === "signin" ? "signup" : "signin"));
+
+  // Show / hide password
+  const passwordInput = $("#auth-password");
+  const toggle = $("#auth-password-toggle");
+  toggle.addEventListener("click", () => {
+    const show = passwordInput.type === "password";
+    passwordInput.type = show ? "text" : "password";
+    toggle.classList.toggle("showing", show);
+    toggle.setAttribute("aria-pressed", String(show));
+    toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");
+    passwordInput.focus();
+  });
 }
