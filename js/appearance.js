@@ -3,7 +3,7 @@
 import { state } from "./state.js";
 import { safeSet } from "./helpers.js";
 
-const THEME_COLORS = { light: "#FAF7FF", dark: "#130F22" };
+const THEME_COLORS = { light: "#FAF7FF", dark: "#120D24" };
 
 function resolveTheme(preference) {
   if (preference === "light" || preference === "dark") return preference;

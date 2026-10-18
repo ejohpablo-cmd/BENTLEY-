@@ -3,11 +3,11 @@
 import { $, toast } from "./helpers.js";
 
 let currentUrl = null;
-let currentName = "bentley-picture.jpg";
+let currentName = "axelvon-picture.jpg";
 
 export function openLightbox(url, name) {
   currentUrl = url;
-  currentName = name || "bentley-picture.jpg";
+  currentName = name || "axelvon-picture.jpg";
   $("#lightbox-image").src = url;
   $("#lightbox").classList.remove("hidden");
   $("#lightbox-close").focus();

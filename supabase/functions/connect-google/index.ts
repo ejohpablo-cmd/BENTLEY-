@@ -17,7 +17,7 @@ const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
 const GOOGLE_REVOKE_URL = "https://oauth2.googleapis.com/revoke";
 const GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo";
 
-// What Bentley is allowed to do: read and send Gmail, manage Calendar, manage Drive files.
+// What Axelvon is allowed to do: read and send Gmail, manage Calendar, manage Drive files.
 const GOOGLE_SCOPES = [
   "openid",
   "email",
@@ -220,7 +220,7 @@ async function readAccountEmail(accessToken: string): Promise<string> {
   return typeof info.email === "string" ? info.email : "";
 }
 
-// The person can untick permissions on Google's screen. Bentley needs all of them.
+// The person can untick permissions on Google's screen. Axelvon needs all of them.
 function hasAllScopes(granted: unknown): boolean {
   const list = typeof granted === "string" ? granted.split(" ") : [];
   return GOOGLE_SCOPES.filter((scope) => scope.startsWith("https://")).every((scope) => list.includes(scope));
@@ -347,7 +347,7 @@ Deno.serve(async (req: Request): Promise<Response> => {
     if (error instanceof HttpError) {
       // A person who followed a bad link sees a short page instead of raw JSON.
       if (req.method === "GET") {
-        return new Response(error.message + " You can close this page and try again from Bentley.", {
+        return new Response(error.message + " You can close this page and try again from Axelvon.", {
           status: error.status,
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         });

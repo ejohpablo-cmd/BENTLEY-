@@ -1,7 +1,7 @@
 // Looking at the photos a person attaches.
 //
 // A separate vision AI (its own secrets: VISION_API_KEY, VISION_API_URL, VISION_MODEL) writes a
-// plain description of each photo. Bentley's own AI then reads that description, so her voice and
+// plain description of each photo. Axelvon's own AI then reads that description, so her voice and
 // system prompt stay exactly as they are.
 import type { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 

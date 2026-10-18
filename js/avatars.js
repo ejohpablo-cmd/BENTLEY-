@@ -1,6 +1,6 @@
-// Builds the round pictures: Bentley's logo and the user's profile photo.
+// Builds the round pictures: Axelvon's logo and the user's profile photo.
 
-import { state, BENTLEY_AVATAR } from "./state.js";
+import { state, AXELVON_AVATAR } from "./state.js";
 import { el } from "./helpers.js";
 
 // Shown if benny.png is missing, so the app never displays a broken image.
@@ -23,11 +23,11 @@ export function attachFallback(image) {
 }
 
 // size: "sm" | "md" | "lg"
-export function buildBentleyAvatar(size) {
+export function buildAxelvonAvatar(size) {
   const image = document.createElement("img");
-  image.className = `avatar bentley-img ${size}`;
-  image.alt = "Bentley";
-  image.src = BENTLEY_AVATAR;
+  image.className = `avatar axelvon-img ${size}`;
+  image.alt = "Axelvon";
+  image.src = AXELVON_AVATAR;
   attachFallback(image);
   return image;
 }

@@ -1,4 +1,4 @@
-// Memory: lets Bentley save short facts about the person (their name, likes, projects) so she can
+// Memory: lets Axelvon save short facts about the person (their name, likes, projects) so she can
 // use them in later chats. Only offered when the person turned Memory on in Settings.
 // Nothing is ever deleted here: "Clear memories" in Settings switches memories off one by one.
 import { defineTool, requiredText, ToolError } from "./tool-kit.ts";

@@ -3,7 +3,7 @@
 export const APP_VERSION = "2.0.0";
 export const MAX_MESSAGE_LENGTH = 4000;
 export const LAST_CONVERSATION_KEY = "bentley_last_conversation";
-export const BENTLEY_AVATAR = "benny.png";
+export const AXELVON_AVATAR = "benny.png";
 
 export const DEFAULT_SETTINGS = {
   theme: "system",
@@ -25,15 +25,16 @@ export const state = {
   conversationId: null,
   messages: [],
   feedback: {}, // message id -> "good" | "bad"
-  actions: {}, // message id -> something Bentley asked to do: { id, summary, status }
+  actions: {}, // message id -> something Axelvon asked to do: { id, summary, status }
 
   // Chat activity
-  busy: false, // true while waiting for Bentley
+  busy: false, // true while waiting for Axelvon
+  streamingText: "", // what Axelvon has written so far while her reply is arriving
   uploading: false, // true while photos are being uploaded before sending
   abortController: null, // lets the Stop button cancel the request
   editingId: null, // id of the user message being edited
   selectedMessageId: null, // user message whose Copy / Edit buttons are showing
-  restingUntil: null, // ISO time when Bentley is back after the usage limit, or null
+  restingUntil: null, // ISO time when Axelvon is back after the usage limit, or null
 
   tab: "chat",
 };
@@ -43,6 +44,7 @@ export function resetChat() {
   if (state.abortController) state.abortController.abort();
   state.abortController = null;
   state.busy = false;
+  state.streamingText = "";
   state.conversationId = null;
   state.messages = [];
   state.feedback = {};

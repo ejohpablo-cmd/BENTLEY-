@@ -3,7 +3,7 @@
 // (POLLINATIONS_API_KEY).
 //
 // The server keeps the keys. The finished picture is saved in the person's own private folder
-// of the chat-images bucket and shown under Bentley's reply.
+// of the chat-images bucket and shown under Axelvon's reply.
 import { defineTool, failureDetail, optionalText, requiredText, ToolError } from "./tool-kit.ts";
 import type { Tool, ToolContext } from "./tool-kit.ts";
 
@@ -141,7 +141,7 @@ const generateImage = defineTool({
     const useCloudflare = Boolean(ctx.cloudflareAccountId && ctx.cloudflareToken);
     if (!useCloudflare && !ctx.nvidiaKey && !ctx.imageKey) throw new ToolError("Picture making is not set up on the server.");
     if (ctx.imageAllowance !== undefined && ctx.images.length >= ctx.imageAllowance) {
-      throw new ToolError("The person has reached their picture limit. Tell them briefly that Bentley needs a rest and they can make more pictures soon.");
+      throw new ToolError("The person has reached their picture limit. Tell them briefly that Axelvon needs a rest and they can make more pictures soon.");
     }
     if (ctx.images.length >= MAX_PER_REPLY) throw new ToolError(`Only ${MAX_PER_REPLY} pictures can be made in one reply.`);
 

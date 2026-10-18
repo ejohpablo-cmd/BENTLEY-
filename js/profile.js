@@ -1,10 +1,10 @@
-// The Profile page: your details, one profile photo, and Bentley's card.
+// The Profile page: your details, one profile photo, and Axelvon's card.
 
 import { state } from "./state.js";
 import { supabase, uploadProfilePhoto } from "./api.js";
 import { $, el, toast } from "./helpers.js";
 import { openModal } from "./modal.js";
-import { buildBentleyAvatar, buildUserAvatar } from "./avatars.js";
+import { buildAxelvonAvatar, buildUserAvatar } from "./avatars.js";
 import { onPageShown } from "./navigation.js";
 
 /* ---------- Loading ---------- */
@@ -60,7 +60,7 @@ function buildProfileCard(profile) {
   const card = el("section", "profile-card");
   card.append(
     buildUserAvatar("lg"),
-    el("h2", "profile-name", profile.display_name || "Bentley User"),
+    el("h2", "profile-name", profile.display_name || "Axelvon User"),
     el("p", "profile-username", `@${profile.username || "user"}`)
   );
   if (profile.bio) card.append(el("p", "profile-bio", profile.bio));
@@ -76,15 +76,15 @@ function buildProfileCard(profile) {
   return card;
 }
 
-function buildBentleyCard() {
-  const card = el("section", "bentley-card");
+function buildAxelvonCard() {
+  const card = el("section", "axelvon-card");
 
   const info = el("div");
   const status = el("p", "status");
   status.append(el("span", "status-dot"), document.createTextNode("Online"));
-  info.append(el("h2", undefined, "Bentley"), el("p", undefined, "AI Creative Companion"), status);
+  info.append(el("h2", undefined, "Axelvon"), el("p", undefined, "AI Creative Companion"), status);
 
-  card.append(buildBentleyAvatar("md"), info);
+  card.append(buildAxelvonAvatar("md"), info);
   return card;
 }
 
@@ -100,7 +100,7 @@ function buildSignOutButton() {
 
 export function renderProfile() {
   const root = $("#profile-root");
-  root.replaceChildren(buildProfileCard(state.profile || {}), buildBentleyCard(), buildSignOutButton());
+  root.replaceChildren(buildProfileCard(state.profile || {}), buildAxelvonCard(), buildSignOutButton());
 }
 
 /* ---------- Profile photo ---------- */

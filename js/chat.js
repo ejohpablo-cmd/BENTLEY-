@@ -3,18 +3,13 @@
 import { state, resetChat, MAX_MESSAGE_LENGTH, LAST_CONVERSATION_KEY } from "./state.js";
 import { supabase, requestChat, uploadChatPhotos } from "./api.js";
 import { $, el, icon, toast, copyText, regenerateEnabled, safeSet, safeRemove } from "./helpers.js";
-import { buildBentleyAvatar } from "./avatars.js";
+import { buildAxelvonAvatar } from "./avatars.js";
 import { renderMarkdown } from "./markdown.js";
 import { shareText } from "./share.js";
+import { finishTyping, isTyping, startTyping, stopTyping, typedText } from "./typewriter.js";
 import { bindUsage, isResting, refreshUsage, startResting } from "./usage.js";
 import { onPageShown, showTab } from "./navigation.js";
 import { bindPhotos, buildPhotos, clearPending, pendingCount, pendingPhotos, releasePending, rememberLocalPhoto, warmPhotoLinks } from "./photos.js";
-
-// The reply Bentley is writing right now (it appears word by word while she works on it).
-//   text         what has arrived so far
-//   hideIndex    when regenerating, the old reply that is replaced as soon as new words arrive
-let live = null;
-let paintQueued = false;
 
 /* =====================================================================
    Loading conversations
@@ -74,7 +69,7 @@ export async function loadConversation(id) {
   const result = await fetchConversation(id);
   if (!result) return false;
   await warmPhotoLinks(result.messages);
-  live = null;
+  stopTyping();
   state.conversationId = id;
   state.messages = result.messages;
   state.feedback = result.feedback;
@@ -136,22 +131,22 @@ function buildThinkingRow() {
   const row = el("div", "thinking");
   const dots = el("span", "dots");
   dots.append(el("span", "dot"), el("span", "dot"), el("span", "dot"));
-  row.append(dots, el("span", "label", "Bentley is thinking…"));
+  row.append(dots, el("span", "label", "Axelvon is thinking…"));
   return row;
 }
 
 // Shown in the middle of the page before the conversation has any message.
 function buildEmptyState() {
   const wrapper = el("div", "empty-state");
-  wrapper.append(buildBentleyAvatar("lg"), el("h2", undefined, "Bentley"));
+  wrapper.append(buildAxelvonAvatar("lg"), el("h2", undefined, "Axelvon"));
   wrapper.append(state.busy ? buildThinkingRow() : el("p", undefined, "Your AI creative companion. Say hi!"));
   return wrapper;
 }
 
-// A conversation that only contains Bentley's opening line: logo in the middle, greeting below it.
+// A conversation that only contains Axelvon's opening line: logo in the middle, greeting below it.
 function buildWelcome(message) {
   const wrapper = el("div", "welcome");
-  wrapper.append(buildBentleyAvatar("lg"), buildBentleyMessage(message, true));
+  wrapper.append(buildAxelvonAvatar("lg"), buildAxelvonMessage(message, true));
   return wrapper;
 }
 
@@ -218,7 +213,7 @@ function buildUserMessage(message) {
   return wrapper;
 }
 
-/* ---------- Bentley asking for approval ---------- */
+/* ---------- Axelvon asking for approval ---------- */
 
 const ACTION_STATUS_TEXT = {
   approved: "Approved",
@@ -226,7 +221,7 @@ const ACTION_STATUS_TEXT = {
   failed: "Approved, but it didn't work",
 };
 
-// Shown under a message where Bentley wants to do something risky (send an email, delete something).
+// Shown under a message where Axelvon wants to do something risky (send an email, delete something).
 // The text is built by the server from what will really happen. Only the newest request can be answered;
 // an older one was cancelled when the chat moved on.
 function buildActionCard(action, isLast) {
@@ -243,7 +238,7 @@ function buildActionCard(action, isLast) {
     const deny = el("button", "btn sm secondary", "Deny");
     [approve, deny].forEach((button) => {
       button.type = "button";
-      button.disabled = state.busy; // greyed out while Bentley is already working on it
+      button.disabled = state.busy; // greyed out while Axelvon is already working on it
     });
     approve.addEventListener("click", () => answerRequest(action, true));
     deny.addEventListener("click", () => answerRequest(action, false));
@@ -253,9 +248,9 @@ function buildActionCard(action, isLast) {
   return card;
 }
 
-/* ---------- Bentley's messages (no bubble, markdown) ---------- */
+/* ---------- Axelvon's messages (no bubble, markdown) ---------- */
 
-function buildBentleyActions(message, isLast) {
+function buildAxelvonActions(message, isLast) {
   const buttons = [
     actionButton("copy", "Copy", async () => {
       toast((await copyText(message.content)) ? "Copied" : "Couldn't copy");
@@ -268,52 +263,61 @@ function buildBentleyActions(message, isLast) {
   return buildActionGroup(buttons);
 }
 
-function buildBentleyMessage(message, isLast) {
-  const wrapper = el("article", "msg bentley");
+function buildAxelvonMessage(message, isLast) {
+  const wrapper = el("article", "msg axelvon");
   const bubble = el("div", "bubble");
   const text = el("div", "markdown");
-  text.innerHTML = renderMarkdown(message.content); // sanitized inside renderMarkdown
+  const typing = isTyping(message.id);
+
+  if (typing) {
+    // A new reply is being written out. The typewriter fills this box; tapping it shows the whole reply.
+    wrapper.dataset.typing = "true";
+    text.classList.add("typing");
+    text.innerHTML = renderMarkdown(typedText(message.id)); // sanitized inside renderMarkdown
+    bubble.addEventListener("click", finishTyping);
+  } else {
+    text.innerHTML = renderMarkdown(message.content); // sanitized inside renderMarkdown
+  }
   bubble.append(text);
 
-  if (message.images && message.images.length > 0) bubble.append(buildPhotos(message.images));
-  const action = message.id ? state.actions[message.id] : null;
-  if (action) bubble.append(buildActionCard(action, isLast));
+  if (!typing) {
+    if (message.images && message.images.length > 0) bubble.append(buildPhotos(message.images));
+    const action = message.id ? state.actions[message.id] : null;
+    if (action) bubble.append(buildActionCard(action, isLast));
+  }
   wrapper.append(bubble);
 
-  if (message.id) wrapper.append(buildBentleyActions(message, isLast && !state.busy));
+  if (message.id && !typing) wrapper.append(buildAxelvonActions(message, isLast && !state.busy));
   return wrapper;
 }
 
-// The reply that is still being written: text only, no buttons yet. The caret shows it is live.
-function buildLiveMessage() {
-  const wrapper = el("article", "msg bentley");
-  wrapper.dataset.live = "true";
-  const bubble = el("div", "bubble");
+// The reply that is still arriving: the words so far, or "thinking" before the first word.
+function fillLiveBubble(bubble) {
+  if (!state.streamingText) {
+    bubble.append(buildThinkingRow());
+    return;
+  }
   const text = el("div", "markdown typing");
-  text.innerHTML = renderMarkdown(live.text); // sanitized inside renderMarkdown
+  text.innerHTML = renderMarkdown(state.streamingText); // sanitized inside renderMarkdown
   bubble.append(text);
-  wrapper.append(bubble);
-  return wrapper;
 }
 
-function hasLiveText() {
-  return Boolean(state.busy && live && live.text);
-}
-
-// Draws the newest words. Runs at most once per frame, and follows the text down unless you scrolled up.
-function paintLive() {
-  paintQueued = false;
-  const box = document.querySelector("[data-live] .markdown");
-  if (!box || !live) return;
-  box.innerHTML = renderMarkdown(live.text); // sanitized inside renderMarkdown
-  const list = $("#messages");
-  if (list.scrollHeight - list.scrollTop - list.clientHeight < 140) list.scrollTop = list.scrollHeight;
-}
-
-function schedulePaint() {
-  if (paintQueued) return;
-  paintQueued = true;
-  requestAnimationFrame(paintLive);
+// Called as Axelvon's words arrive. Redraws at most once per frame, and follows the text down
+// unless the person scrolled up to read.
+let livePaintQueued = false;
+function showStreamedText(text) {
+  state.streamingText = text;
+  if (livePaintQueued) return;
+  livePaintQueued = true;
+  requestAnimationFrame(() => {
+    livePaintQueued = false;
+    const bubble = document.querySelector("#messages [data-live] .bubble");
+    if (!bubble) return;
+    bubble.replaceChildren();
+    fillLiveBubble(bubble);
+    const list = $("#messages");
+    if (list.scrollHeight - list.scrollTop - list.clientHeight < 140) list.scrollTop = list.scrollHeight;
+  });
 }
 
 /* ---------- The whole message list ---------- */
@@ -324,32 +328,23 @@ export function renderMessages({ keepScroll = false } = {}) {
   root.replaceChildren();
 
   if (state.messages.length === 0) {
-    if (hasLiveText()) {
-      // Bentley's opening line arriving: logo in the middle, greeting below it.
-      const welcome = el("div", "welcome");
-      welcome.append(buildBentleyAvatar("lg"), buildLiveMessage());
-      root.append(welcome);
-    } else {
-      root.append(buildEmptyState());
-    }
-  } else if (isGreetingOnly() && !hasLiveText()) {
+    root.append(buildEmptyState());
+  } else if (isGreetingOnly()) {
     root.append(buildWelcome(state.messages[0]));
   } else {
     const lastReply = lastAssistantIndex();
     state.messages.forEach((message, index) => {
-      if (hasLiveText() && live.hideIndex === index) return; // being replaced by the new version
-      root.append(message.role === "user" ? buildUserMessage(message) : buildBentleyMessage(message, index === lastReply));
+      root.append(message.role === "user" ? buildUserMessage(message) : buildAxelvonMessage(message, index === lastReply));
     });
   }
 
-  if (hasLiveText() && state.messages.length > 0) root.append(buildLiveMessage());
-
-  if (state.busy && state.messages.length > 0 && !hasLiveText()) {
-    const thinking = el("article", "msg bentley");
+  if (state.busy && state.messages.length > 0) {
+    const live = el("article", "msg axelvon");
+    live.dataset.live = "true";
     const bubble = el("div", "bubble");
-    bubble.append(buildThinkingRow());
-    thinking.append(bubble);
-    root.append(thinking);
+    fillLiveBubble(bubble);
+    live.append(bubble);
+    root.append(live);
   }
 
   if (keepScroll) root.scrollTop = previousScroll;
@@ -382,7 +377,7 @@ export function updateComposer() {
 
   button.disabled = !state.busy && (!hasContent || state.uploading || resting);
   $("#chat-input").disabled = resting;
-  $("#chat-input").placeholder = resting ? "Bentley is resting…" : "Talk to Bentley";
+  $("#chat-input").placeholder = resting ? "Axelvon is resting…" : "Talk to Axelvon";
   $("#composer").classList.toggle("resting", resting);
   button.classList.toggle("is-stop", state.busy);
   button.setAttribute("aria-label", state.busy ? "Stop response" : "Send message");
@@ -411,50 +406,27 @@ function cancelEdit() {
 }
 
 /* =====================================================================
-   Talking to Bentley
+   Talking to Axelvon
    ===================================================================== */
 
-// Runs one request to Bentley while showing the "thinking" state.
-//   request(signal)  makes the call and returns Bentley's answer
+// Runs one request to Axelvon while showing the "thinking" state.
+//   request(signal, onText)  makes the call and returns Axelvon's answer (onText shows words as they arrive)
 //   apply(result)    puts the answer into state.messages
-//   request(signal, handlers)  makes the call (pass the handlers on to requestChat to stream the reply)
-//   replaceIndex               when regenerating, the index of the reply being replaced
-async function askBentley({ request, apply, failureText, replaceIndex = null }) {
+async function askAxelvon({ request, apply, failureText }) {
   const controller = new AbortController();
   state.abortController = controller;
   state.busy = true;
-  live = { text: "", hideIndex: replaceIndex };
   renderMessages();
 
-  // New words from Bentley. The first ones swap the "thinking" dots for the live reply.
-  const handlers = {
-    onDelta: (text) => {
-      if (state.abortController !== controller || !live) return;
-      const isFirst = live.text === "";
-      live.text += text;
-      if (isFirst) renderMessages();
-      else schedulePaint();
-    },
-    // She started using a tool: what was written so far was only a lead-in, so show the dots again.
-    onReset: () => {
-      if (state.abortController !== controller || !live) return;
-      live.text = "";
-      renderMessages();
-    },
-  };
-
   try {
-    const result = await request(controller.signal, handlers);
-    live = null; // the saved reply replaces the live one
-    apply(result);
+    apply(await request(controller.signal, showStreamedText));
   } catch (error) {
     // Another chat was opened while waiting, so this request no longer matters.
     if (state.abortController !== controller) return;
-    live = null;
 
     if (error.restingUntil) {
       startResting(error.restingUntil); // the usage limit was reached: show the countdown
-      toast("Bentley needs a rest. See the countdown below.");
+      toast("Axelvon needs a rest. See the countdown below.");
     } else if (error.name !== "AbortError") {
       console.error(error);
       toast(failureText);
@@ -464,7 +436,7 @@ async function askBentley({ request, apply, failureText, replaceIndex = null }) 
     if (state.abortController === controller) {
       state.abortController = null;
       state.busy = false;
-      live = null;
+      state.streamingText = "";
       renderMessages();
       refreshUsage(); // a reply may have used up the limit, which starts the rest
     }
@@ -483,6 +455,8 @@ async function sendMessage() {
     toast("That message is too long.");
     return;
   }
+
+  finishTyping(); // a reply still being written is shown in full first
 
   // Photos go up first. If that fails, the text and photos stay in the box so nothing is lost.
   let photoPaths = [];
@@ -518,8 +492,8 @@ async function sendMessage() {
   }
   const yourMessage = state.messages[state.messages.length - 1];
 
-  await askBentley({
-    request: async (signal, handlers) => {
+  await askAxelvon({
+    request: async (signal, onText) => {
       const conversationId = state.conversationId || (await createConversation());
       safeSet(LAST_CONVERSATION_KEY, conversationId);
       return requestChat(
@@ -530,16 +504,23 @@ async function sendMessage() {
           images: photoPaths.length > 0 ? photoPaths : undefined,
         },
         signal,
-        handlers
+        onText
       );
     },
     apply: (result) => {
       if (result.user_message && result.user_message.id) yourMessage.id = result.user_message.id;
       state.messages.push(result.message);
       rememberAction(result);
+      typeReply(result.message);
     },
-    failureText: "Bentley couldn't reply right now. Please try again.",
+    failureText: "Axelvon couldn't reply right now. Please try again.",
   });
+}
+
+// Writes a brand new reply out letter by letter (the typewriter effect).
+function typeReply(message) {
+  if (state.streamingText) return; // it was already shown word by word
+  if (message && message.id) startTyping(message.id, message.content, () => renderMessages({ keepScroll: true }));
 }
 
 function regenerate() {
@@ -547,61 +528,63 @@ function regenerate() {
   const index = lastAssistantIndex();
   if (index < 0) return;
 
-  askBentley({
-    replaceIndex: index,
-    request: (signal, handlers) => requestChat({ conversation_id: state.conversationId, regenerate: true }, signal, handlers),
+  askAxelvon({
+    request: (signal, onText) => requestChat({ conversation_id: state.conversationId, regenerate: true }, signal, onText),
     apply: (result) => {
       delete state.feedback[state.messages[index].id];
       delete state.actions[state.messages[index].id];
       state.messages[index] = result.message;
       rememberAction(result);
+      typeReply(result.message);
     },
     failureText: "Couldn't regenerate. Please try again.",
   });
 }
 
-// Bentley opens an empty conversation with a fresh greeting.
+// Axelvon opens an empty conversation with a fresh greeting.
 function greet() {
-  askBentley({
-    request: async (signal, handlers) => {
+  askAxelvon({
+    request: async (signal, onText) => {
       const conversationId = state.conversationId || (await createConversation());
       safeSet(LAST_CONVERSATION_KEY, conversationId);
-      return requestChat({ conversation_id: conversationId, greet: true }, signal, handlers);
+      return requestChat({ conversation_id: conversationId, greet: true }, signal, onText);
     },
     apply: (result) => {
       state.messages.push(result.message);
+      typeReply(result.message);
     },
-    failureText: "Bentley couldn't say hi right now.",
+    failureText: "Axelvon couldn't say hi right now.",
   });
 }
 
-// If Bentley's answer asks for approval, keep the request so its card can be shown.
+// If Axelvon's answer asks for approval, keep the request so its card can be shown.
 function rememberAction(result) {
   if (result.action) state.actions[result.message.id] = result.action;
 }
 
-// Approve or Deny. Bentley then carries on (for example, tells you the email was sent).
+// Approve or Deny. Axelvon then carries on (for example, tells you the email was sent).
 function answerRequest(action, approve) {
   if (state.busy || !state.conversationId || isResting()) return;
 
-  askBentley({
-    request: (signal, handlers) =>
-      requestChat({ conversation_id: state.conversationId, action_id: action.id, approve }, signal, handlers),
+  askAxelvon({
+    request: (signal, onText) =>
+      requestChat({ conversation_id: state.conversationId, action_id: action.id, approve }, signal, onText),
     apply: (result) => {
       action.status = result.resolved_action.status;
       state.messages.push(result.message);
       rememberAction(result);
+      typeReply(result.message);
     },
     failureText: "Couldn't complete that. Please try again.",
   });
 }
 
-// "New chat": an empty page, and Bentley greets you as soon as it is shown.
+// "New chat": an empty page, and Axelvon greets you as soon as it is shown.
 export function startNewChat() {
   // An empty conversation (for example a greeting that failed) is reused instead of creating another.
   const reusableId = state.messages.length === 0 ? state.conversationId : null;
   resetChat();
-  live = null;
+  stopTyping();
   state.conversationId = reusableId;
   if (!reusableId) safeRemove(LAST_CONVERSATION_KEY);
 
@@ -654,7 +637,7 @@ export function bindChat() {
     if (!state.busy) sendMessage();
   });
 
-  // The same button sends a message, or stops Bentley while a reply is on the way.
+  // The same button sends a message, or stops Axelvon while a reply is on the way.
   $("#composer").addEventListener("submit", (event) => {
     event.preventDefault();
     if (state.busy) stopResponse();
@@ -665,7 +648,7 @@ export function bindChat() {
   $("#cancel-edit-btn").addEventListener("click", cancelEdit);
   $("#new-chat-btn").addEventListener("click", startNewChat);
 
-  // Each time the Chat page is shown: jump to the newest message, or let Bentley say hi in an empty chat.
+  // Each time the Chat page is shown: jump to the newest message, or let Axelvon say hi in an empty chat.
   onPageShown("chat", () => {
     scrollToBottom();
     if (state.messages.length === 0 && !state.busy && state.user && !isResting()) greet();

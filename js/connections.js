@@ -37,7 +37,7 @@ export async function connectGoogle() {
 export function openDisconnectGoogle(onDone) {
   confirmDialog({
     title: "Disconnect Google?",
-    message: "Bentley will no longer be able to use your Gmail, Calendar or Drive. You can connect again any time.",
+    message: "Axelvon will no longer be able to use your Gmail, Calendar or Drive. You can connect again any time.",
     confirmLabel: "Disconnect",
     onConfirm: async () => {
       try {
@@ -61,19 +61,19 @@ const TOKEN_PROVIDERS = {
   github: {
     name: "GitHub",
     placeholder: "github_pat_…",
-    help: "Create a personal access token on GitHub (Settings → Developer settings → Personal access tokens). Choose the repositories Bentley may use and give it read and write access to Contents, Issues and Pull requests.",
+    help: "Create a personal access token on GitHub (Settings → Developer settings → Personal access tokens). Choose the repositories Axelvon may use and give it read and write access to Contents, Issues and Pull requests.",
     removes: "read or change your GitHub repositories",
   },
   supabase: {
     name: "Supabase",
     placeholder: "sbp_…",
-    help: "Create an access token at supabase.com/dashboard/account/tokens and paste it here. It lets Bentley reach all of your Supabase projects, and she asks you before running any SQL.",
+    help: "Create an access token at supabase.com/dashboard/account/tokens and paste it here. It lets Axelvon reach all of your Supabase projects, and she asks you before running any SQL.",
     removes: "reach your Supabase projects",
   },
   composio: {
     name: "Composio",
     placeholder: "Your Composio API key",
-    help: "Copy your API key from your Composio dashboard. Connect your apps inside Composio first, then Bentley can use them.",
+    help: "Copy your API key from your Composio dashboard. Connect your apps inside Composio first, then Axelvon can use them.",
     removes: "use your Composio apps",
   },
 };
@@ -141,7 +141,7 @@ export function openDisconnectToken(provider, onDone) {
   const details = TOKEN_PROVIDERS[provider];
   confirmDialog({
     title: `Disconnect ${details.name}?`,
-    message: `Bentley will no longer be able to ${details.removes}. You can connect again any time.`,
+    message: `Axelvon will no longer be able to ${details.removes}. You can connect again any time.`,
     confirmLabel: "Disconnect",
     onConfirm: async () => {
       try {
@@ -161,7 +161,7 @@ export function openDisconnectToken(provider, onDone) {
 
 const CONNECT_ERRORS = {
   cancelled: "Google connection cancelled.",
-  permissions: "Bentley needs every permission ticked to work. Please try again.",
+  permissions: "Axelvon needs every permission ticked to work. Please try again.",
   failed: "Couldn't connect Google. Please try again.",
 };
 

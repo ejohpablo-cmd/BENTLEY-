@@ -1,4 +1,4 @@
-// App lock: a PIN (4 to 6 digits) that hides Bentley when it is opened or comes back from the background.
+// App lock: a PIN (4 to 6 digits) that hides Axelvon when it is opened or comes back from the background.
 //
 // SAFE CHOICE: the PIN is kept only on this device (a salted hash, never the PIN itself) and protects against
 // someone casually picking up the phone. It is not account security. "Forgot PIN" signs the person out.

@@ -4,6 +4,8 @@
 alter table public.user_settings
   add column if not exists personality text not null default 'friendly'
     check (personality in ('friendly','professional','playful','direct'));
+-- If an older version of the app already made this column (default 'default'), only the default for NEW rows changes.
+alter table public.user_settings alter column personality set default 'friendly';
 
 -- Usage counters for the "4 pictures / 3M tokens" cycle and the 1h 30m rest.
 create table if not exists public.user_usage (

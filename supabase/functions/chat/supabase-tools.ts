@@ -1,8 +1,8 @@
-// The things Bentley can do with the person's Supabase projects, using the access token they saved.
+// The things Axelvon can do with the person's Supabase projects, using the access token they saved.
 //
 // Listing projects, tables and functions and reading a table's rows run on their own.
 // Running SQL is risky: the person always sees the exact SQL and approves it first.
-// Bentley's own saved connection tokens can never be read or changed through these tools.
+// Axelvon's own saved connection tokens can never be read or changed through these tools.
 import { defineTool, failureDetail, jsonRequest, limit, optionalText, requiredText, savedToken, shorten, ToolError } from "./tool-kit.ts";
 import type { Args, Tool, ToolContext } from "./tool-kit.ts";
 
@@ -49,9 +49,9 @@ function identifier(args: Args, key: string, fallback?: string): string {
   return value;
 }
 
-// Bentley's saved tokens live in this table and must never pass through the AI.
+// Axelvon's saved tokens live in this table and must never pass through the AI.
 function guardSecrets(text: string) {
-  if (/connection_secrets/i.test(text)) throw new ToolError("Bentley's connection tokens are off-limits.");
+  if (/connection_secrets/i.test(text)) throw new ToolError("Axelvon's connection tokens are off-limits.");
 }
 
 /* ---------- Reading ---------- */

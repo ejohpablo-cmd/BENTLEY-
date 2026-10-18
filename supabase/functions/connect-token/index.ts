@@ -78,7 +78,7 @@ type Check = (token: string) => Promise<string | null>;
 const CHECKS: Record<Provider, Check> = {
   async github(token) {
     const response = await fetch("https://api.github.com/user", {
-      headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "User-Agent": "Bentley" },
+      headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json", "User-Agent": "Axelvon" },
     });
     if (!response.ok) return null;
     const user = await response.json();

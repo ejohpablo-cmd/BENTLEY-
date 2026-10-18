@@ -5,7 +5,7 @@
 import { el, toast, copyText } from "./helpers.js";
 import { openModal } from "./modal.js";
 
-const TITLE = "Bentley";
+const TITLE = "Axelvon";
 
 function openFallbackSheet(text) {
   const message = encodeURIComponent(text);

@@ -1,4 +1,4 @@
-// The list of everything Bentley can do. Each connection has its own file; this one joins them
+// The list of everything Axelvon can do. Each connection has its own file; this one joins them
 // and offers the AI only the tools for the connections that are actually available.
 import { COMPOSIO_TOOLS } from "./composio-tools.ts";
 import { GITHUB_TOOLS } from "./github-tools.ts";

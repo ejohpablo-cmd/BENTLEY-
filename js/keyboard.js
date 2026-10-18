@@ -45,14 +45,10 @@ function update() {
 
   root.style.setProperty("--app-height", `${fullHeight}px`);
   root.style.setProperty("--kb", `${keyboard}px`);
-
-  // The visible area (what is left above the keyboard). Pop-ups are sized to it.
-  const visibleHeight = viewport ? Math.round(viewport.height) : innerHeight;
-  const visibleTop = viewport ? Math.round(viewport.offsetTop) : 0;
-  root.style.setProperty("--vv-h", `${visibleHeight}px`);
-  root.style.setProperty("--vv-top", `${visibleTop}px`);
-  root.classList.toggle("kb-open", keyboard > 0 || visibleHeight < fullHeight - MIN_KEYBOARD_PX);
-  root.classList.toggle("short-screen", visibleHeight < 560);
+  // The part of the screen you can really see. Pop-ups use this, so they fit above the keyboard
+  // whether the browser overlays the keyboard or shrinks the page.
+  root.style.setProperty("--vv-top", `${viewport ? Math.round(viewport.offsetTop) : 0}px`);
+  root.style.setProperty("--vv-height", `${viewport ? Math.round(viewport.height) : innerHeight}px`);
 
   if (keyboard !== lastKeyboard) {
     lastKeyboard = keyboard;

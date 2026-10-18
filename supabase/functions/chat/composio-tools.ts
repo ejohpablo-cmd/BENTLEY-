@@ -1,8 +1,8 @@
-// Composio gives Bentley hundreds more apps (Slack, Notion, Trello and so on) through one key.
-// The person connects each app inside their Composio account; Bentley finds an action and runs it.
+// Composio gives Axelvon hundreds more apps (Slack, Notion, Trello and so on) through one key.
+// The person connects each app inside their Composio account; Axelvon finds an action and runs it.
 //
 // Finding actions and listing connected apps run on their own. Running an action is always risky,
-// because Bentley cannot know in advance what an action will change: the person approves it first.
+// because Axelvon cannot know in advance what an action will change: the person approves it first.
 import { defineTool, failureDetail, jsonRequest, limit, optionalText, requiredText, savedToken, shorten, ToolError } from "./tool-kit.ts";
 import type { Tool, ToolContext } from "./tool-kit.ts";
 
@@ -64,7 +64,7 @@ const findTools = defineTool({
   name: "composio_find_actions",
   provider: "composio",
   description:
-    "Search Composio for actions Bentley can run, for example 'create a Trello card'. Returns each action's name and the inputs it needs.",
+    "Search Composio for actions Axelvon can run, for example 'create a Trello card'. Returns each action's name and the inputs it needs.",
   parameters: {
     type: "object",
     properties: {

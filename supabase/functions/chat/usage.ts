@@ -1,4 +1,4 @@
-// Fair-use limits: 4 pictures and 3 million tokens per cycle. When either one is used up, Bentley
+// Fair-use limits: 4 pictures and 3 million tokens per cycle. When either one is used up, Axelvon
 // rests for 1 hour 30 minutes. After the rest the counters start again at zero and the cycle repeats.
 //
 // The numbers live in the user_usage table. People can read their own row (so the app can show the
@@ -13,11 +13,11 @@ export const REST_MS = 90 * 60 * 1000; // 1 hour 30 minutes
 
 export type Usage = { tokens: number; images: number };
 
-// Thrown while the person is resting. "until" is when they can use Bentley again (ISO time).
+// Thrown while the person is resting. "until" is when they can use Axelvon again (ISO time).
 export class RestingError extends Error {
   until: string;
   constructor(until: string) {
-    super("You've used up your limit for now. Bentley is resting.");
+    super("You've used up your limit for now. Axelvon is resting.");
     this.until = until;
   }
 }

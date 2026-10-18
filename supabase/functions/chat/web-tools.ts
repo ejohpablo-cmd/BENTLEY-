@@ -1,7 +1,7 @@
 // Live information from the web: searching it and reading a page.
 //
 // Both tools go through Tavily, a search service built for AI. The server keeps the key
-// (the TAVILY_API_KEY secret) and Bentley's own server never opens the pages itself.
+// (the TAVILY_API_KEY secret) and Axelvon's own server never opens the pages itself.
 import { defineTool, failureDetail, limit, optionalText, requiredText, shorten, ToolError } from "./tool-kit.ts";
 import type { Tool, ToolContext } from "./tool-kit.ts";
 

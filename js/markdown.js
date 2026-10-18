@@ -1,4 +1,4 @@
-// Turns Bentley's markdown (**bold**, *italic*, > quotes, lists, code...) into safe HTML.
+// Turns Axelvon's markdown (**bold**, *italic*, > quotes, lists, code...) into safe HTML.
 
 import { marked } from "https://cdn.jsdelivr.net/npm/marked@12.0.2/+esm";
 import DOMPurify from "https://cdn.jsdelivr.net/npm/dompurify@3.2.6/+esm";

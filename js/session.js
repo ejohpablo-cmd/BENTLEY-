@@ -11,9 +11,11 @@ import { loadConnections, announceConnectionResult } from "./connections.js";
 import { showTab } from "./navigation.js";
 import { lockNow } from "./applock.js";
 import { clearResting, refreshUsage } from "./usage.js";
+import { stopTyping } from "./typewriter.js";
 
 function clearSignedOutState() {
   resetChat();
+  stopTyping();
   clearResting();
   state.user = null;
   state.profile = null;
@@ -51,10 +53,10 @@ export async function handleSession(session) {
     toast("Couldn't load your data. Please refresh.");
   }
 
-  // Is Bentley resting after the usage limit? This decides whether the input box is locked.
+  // Is Axelvon resting after the usage limit? This decides whether the input box is locked.
   await refreshUsage();
 
-  // Open the Chat page, which makes Bentley say hi when there is no saved conversation.
+  // Open the Chat page, which makes Axelvon say hi when there is no saved conversation.
   renderMessages();
   showTab("chat");
 }

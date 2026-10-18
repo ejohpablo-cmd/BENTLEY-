@@ -1,4 +1,4 @@
-// The Settings page: Appearance, Bentley, Connections, Chat, Privacy & security and About.
+// The Settings page: Appearance, Axelvon, Connections, Chat, Privacy & security and About.
 
 import { state, resetChat, DEFAULT_SETTINGS, LAST_CONVERSATION_KEY } from "./state.js";
 import { supabase, sendAppFeedback } from "./api.js";
@@ -6,6 +6,7 @@ import { $, el, toast, regenerateEnabled, safeGet, safeSet, safeRemove } from ".
 import { confirmDialog, openModal } from "./modal.js";
 import { applyAppearance } from "./appearance.js";
 import { renderMessages } from "./chat.js";
+import { stopTyping } from "./typewriter.js";
 import { isLockOn, openTurnOnLock, openTurnOffLock } from "./applock.js";
 import { openPrivacyPolicy, openTerms } from "./legal.js";
 import { getConnection, connectGoogle, openDisconnectGoogle, openConnectToken, openDisconnectToken } from "./connections.js";
@@ -23,7 +24,7 @@ const SECTIONS = [
     ],
   },
   {
-    title: "Bentley",
+    title: "Axelvon",
     rows: [
       {
         type: "select",
@@ -31,7 +32,7 @@ const SECTIONS = [
         label: "Personality",
         options: options(["friendly", "Friendly"], ["professional", "Professional"], ["playful", "Playful"], ["direct", "Direct"]),
       },
-      { type: "toggle", key: "memory_enabled", label: "Memory", hint: "Bentley remembers things you tell her" },
+      { type: "toggle", key: "memory_enabled", label: "Memory", hint: "Axelvon remembers things you tell her" },
       { type: "button", label: "Clear memories", buttonLabel: "Clear", danger: true, onClick: openClearMemories },
     ],
   },
@@ -46,7 +47,7 @@ const SECTIONS = [
   },
   {
     title: "Chat",
-    rows: [{ type: "toggle", key: "regenerate", label: "Regenerate response", hint: "Show the button on Bentley's latest reply" }],
+    rows: [{ type: "toggle", key: "regenerate", label: "Regenerate response", hint: "Show the button on Axelvon's latest reply" }],
   },
   {
     title: "Privacy & security",
@@ -67,6 +68,12 @@ const SECTIONS = [
 
 /* ---------- Loading and saving ---------- */
 
+const ALLOWED_VALUES = {
+  theme: ["light", "dark", "system"],
+  personality: ["friendly", "professional", "playful", "direct"],
+  bubble_style: ["rounded", "soft", "square"],
+};
+
 // The bubble style and the Regenerate button are kept on this phone only (not in the account).
 function getSetting(key) {
   if (key === "regenerate") return regenerateEnabled();
@@ -85,6 +92,10 @@ export async function loadSettings() {
   }
 
   state.settings = { ...DEFAULT_SETTINGS, ...row, bubble_style: safeGet("bentley_bubble") || "rounded" };
+  // An older version of the app saved other values (for example personality "default"). Unknown ones fall back.
+  for (const [key, allowed] of Object.entries(ALLOWED_VALUES)) {
+    if (!allowed.includes(state.settings[key])) state.settings[key] = DEFAULT_SETTINGS[key];
+  }
 
   // The new off-white look starts as Light once. After that the person's own choice is kept.
   if (!safeGet("bentley_theme_v2")) {
@@ -131,6 +142,7 @@ function buildSelect(row) {
     select.append(option);
   });
   select.value = getSetting(row.key);
+  if (select.value !== String(getSetting(row.key))) select.selectedIndex = 0; // never show an empty box
   select.addEventListener("change", () => updateSetting(row.key, select.value));
   return select;
 }
@@ -214,7 +226,7 @@ export function renderSettings() {
 function openClearMemories() {
   confirmDialog({
     title: "Clear memories?",
-    message: "Bentley will forget everything she remembered about you. Your chats stay as they are.",
+    message: "Axelvon will forget everything she remembered about you. Your chats stay as they are.",
     confirmLabel: "Clear memories",
     onConfirm: async () => {
       // Memories are switched off (not erased from the database), and only the person's own are touched.
@@ -256,7 +268,7 @@ async function downloadMyData() {
     const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
     const link = document.createElement("a");
     link.href = url;
-    link.download = "bentley-data.json";
+    link.download = "axelvon-data.json";
     document.body.append(link);
     link.click();
     link.remove();
@@ -309,6 +321,7 @@ function openClearChats() {
       }
 
       resetChat();
+      stopTyping();
       safeRemove(LAST_CONVERSATION_KEY);
       renderMessages();
       toast("Chats cleared");

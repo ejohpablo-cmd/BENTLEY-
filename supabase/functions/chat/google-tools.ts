@@ -1,4 +1,4 @@
-// The things Bentley can do in Gmail, Google Calendar and Google Drive.
+// The things Axelvon can do in Gmail, Google Calendar and Google Drive.
 //
 // Nothing here can permanently delete anything. Drive files go to the trash, which can be undone.
 import { defineTool, jsonRequest, limit, optionalDate, optionalText, requiredId, requiredText, shorten, ToolError } from "./tool-kit.ts";
@@ -543,7 +543,7 @@ const driveCreateDoc = defineTool({
   risky: false,
   parse: (raw) => ({ name: requiredText(raw, "name", 200), content: requiredText(raw, "content", 20000) }),
   async run({ name, content }, ctx) {
-    const boundary = `bentley-${crypto.randomUUID()}`;
+    const boundary = `axelvon-${crypto.randomUUID()}`;
     const body =
       `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n` +
       `${JSON.stringify({ name, mimeType: GOOGLE_DOC })}\r\n` +

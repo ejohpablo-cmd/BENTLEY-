@@ -1,5 +1,5 @@
 // Photos in the chat: taking or choosing them, the preview strip above the input box,
-// and showing photos (yours and the ones Bentley makes) inside messages.
+// and showing photos (yours and the ones Axelvon makes) inside messages.
 //
 // Photos are shrunk and saved as JPG before they leave the phone. They live in a private
 // storage folder, so they are shown through short-lived links.

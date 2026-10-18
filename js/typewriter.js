@@ -1,4 +1,4 @@
-// Typewriter effect: Bentley's new replies are written out letter by letter.
+// Typewriter effect: Axelvon's new replies are written out letter by letter.
 // Only one reply is typed at a time. Tapping the reply (or sending a new message) finishes it at once.
 
 import { renderMarkdown } from "./markdown.js";

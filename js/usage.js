@@ -1,4 +1,4 @@
-// The rest countdown. After 4 pictures or 3M tokens Bentley rests for 1 hour 30 minutes.
+// The rest countdown. After 4 pictures or 3M tokens Axelvon rests for 1 hour 30 minutes.
 // The server decides when that happens (supabase/functions/chat/usage.ts); this file only shows the countdown
 // and locks the input box until the rest is over.
 
@@ -46,7 +46,7 @@ function render() {
   onChange();
 }
 
-// Called when the server says Bentley is resting (a 429 answer with the time).
+// Called when the server says Axelvon is resting (a 429 answer with the time).
 export function startResting(until) {
   state.restingUntil = until;
   render();

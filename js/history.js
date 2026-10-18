@@ -65,7 +65,7 @@ function renderHistory(conversations) {
     const empty = el("div", "empty-state");
     empty.append(
       el("h2", undefined, "No conversations yet"),
-      el("p", undefined, "Start chatting with Bentley and your conversations will appear here.")
+      el("p", undefined, "Start chatting with Axelvon and your conversations will appear here.")
     );
     root.append(empty);
     return;

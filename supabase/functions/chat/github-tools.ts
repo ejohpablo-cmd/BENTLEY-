@@ -1,4 +1,4 @@
-// The things Bentley can do on GitHub, using the personal access token the person saved.
+// The things Axelvon can do on GitHub, using the personal access token the person saved.
 //
 // Reading runs on its own. Anything that writes (an issue, a comment, a file, a branch, a pull
 // request) is risky and waits for the person to approve it. Nothing here deletes a repository,
@@ -32,7 +32,7 @@ async function github(ctx: ToolContext, path: string, init: RequestInit = {}): P
       Authorization: `Bearer ${token}`,
       Accept: "application/vnd.github+json",
       "X-GitHub-Api-Version": "2022-11-28",
-      "User-Agent": "Bentley",
+      "User-Agent": "Axelvon",
     },
     signal: ctx.signal,
   });

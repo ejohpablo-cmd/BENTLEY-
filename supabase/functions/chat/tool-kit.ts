@@ -28,7 +28,7 @@ export type ToolContext = {
   cloudflareToken?: string;
   memoryOn?: boolean; // the person turned Memory on in Settings
   imageAllowance?: number; // how many more pictures the person may make before resting
-  images: string[]; // pictures made during this request (storage paths), saved with Bentley's reply
+  images: string[]; // pictures made during this request (storage paths), saved with Axelvon's reply
   accessToken?: string; // filled in the first time Google is called
   tokens?: Record<string, string>; // saved tokens already read during this request
 };
