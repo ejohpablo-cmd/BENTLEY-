@@ -82,7 +82,7 @@ function buildAxelvonCard() {
   const info = el("div");
   const status = el("p", "status");
   status.append(el("span", "status-dot"), document.createTextNode("Online"));
-  info.append(el("h2", undefined, "Axelvon"), el("p", undefined, "AI Creative Companion"), status);
+  info.append(el("h2", undefined, "Axelvon"), el("p", undefined, "Your Multipurpose Partner"), status);
 
   card.append(buildAxelvonAvatar("md"), info);
   return card;

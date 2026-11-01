@@ -68,7 +68,7 @@ const SECTIONS = [
   {
     title: "About",
     rows: [
-      { type: "info", label: "About Axelvon", value: "AI Creative Companion" },
+      { type: "info", label: "About Axelvon", value: "Your Multipurpose Partner" },
       { type: "info", label: "Version", value: APP_VERSION },
       { type: "button", label: "Feedback", buttonLabel: "Send", onClick: openFeedback },
       { type: "button", label: "Privacy policy", buttonLabel: "Read", onClick: openPrivacyPolicy },

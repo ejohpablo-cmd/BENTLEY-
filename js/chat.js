@@ -139,7 +139,7 @@ function buildThinkingRow() {
 function buildEmptyState() {
   const wrapper = el("div", "empty-state");
   wrapper.append(buildAxelvonAvatar("lg"), el("h2", undefined, "Axelvon"));
-  wrapper.append(state.busy ? buildThinkingRow() : el("p", undefined, "Your AI creative companion. Say hi!"));
+  wrapper.append(state.busy ? buildThinkingRow() : el("p", undefined, "Your multipurpose partner. Say hi!"));
   return wrapper;
 }
 
