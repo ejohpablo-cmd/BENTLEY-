@@ -2,7 +2,7 @@
 
 import { state, resetChat, MAX_MESSAGE_LENGTH, LAST_CONVERSATION_KEY } from "./state.js";
 import { supabase, requestChat, uploadChatPhotos } from "./api.js";
-import { $, el, icon, toast, copyText, regenerateEnabled, safeSet, safeRemove } from "./helpers.js";
+import { $, el, icon, toast, copyText, regenerateEnabled, formatTime, safeSet, safeRemove } from "./helpers.js";
 import { buildAxelvonAvatar } from "./avatars.js";
 import { renderMarkdown } from "./markdown.js";
 import { shareText } from "./share.js";
@@ -188,6 +188,12 @@ function buildUserActions(message) {
   return buildActionGroup(buttons);
 }
 
+// The small time under a message (Settings > Timestamps). Nothing is added while it is off.
+function buildTime(message) {
+  if (!state.settings.show_timestamps || !message.created_at) return null;
+  return el("span", "msg-time", formatTime(message.created_at));
+}
+
 function buildUserMessage(message) {
   const wrapper = el("article", "msg user");
   if (message.images && message.images.length > 0) wrapper.append(buildPhotos(message.images));
@@ -209,6 +215,8 @@ function buildUserMessage(message) {
 
   // A message that is only photos has no bubble.
   if (message.content) wrapper.append(bubble);
+  const time = buildTime(message);
+  if (time) wrapper.append(time);
   if (message.id && state.selectedMessageId === message.id) wrapper.append(buildUserActions(message));
   return wrapper;
 }
@@ -286,6 +294,8 @@ function buildAxelvonMessage(message, isLast) {
     if (action) bubble.append(buildActionCard(action, isLast));
   }
   wrapper.append(bubble);
+  const time = typing ? null : buildTime(message);
+  if (time) wrapper.append(time);
 
   if (message.id && !typing) wrapper.append(buildAxelvonActions(message, isLast && !state.busy));
   return wrapper;

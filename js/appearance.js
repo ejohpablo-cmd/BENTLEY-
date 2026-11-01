@@ -1,9 +1,9 @@
-// Theme (light, dark or follow the phone) and chat bubble style, applied to the whole page.
+// Theme (light, dark or follow the phone), chat bubble style, font size and animations, applied to the whole page.
 
 import { state } from "./state.js";
 import { safeSet } from "./helpers.js";
 
-const THEME_COLORS = { light: "#FAF7FF", dark: "#120D24" };
+const THEME_COLORS = { light: "#FFFFFF", dark: "#000000" };
 
 function resolveTheme(preference) {
   if (preference === "light" || preference === "dark") return preference;
@@ -17,9 +17,13 @@ export function applyAppearance() {
 
   root.setAttribute("data-theme", theme);
   root.setAttribute("data-bubble", state.settings.bubble_style || "rounded");
+  root.setAttribute("data-font", state.settings.font_size || "medium");
+  root.setAttribute("data-animations", state.settings.animations === false ? "off" : "on");
   // Remembered on this phone so the next start paints the right colours straight away (see theme-init.js).
   safeSet("bentley_theme", state.settings.theme);
   safeSet("bentley_bubble", state.settings.bubble_style || "rounded");
+  safeSet("bentley_font", state.settings.font_size || "medium");
+  safeSet("bentley_animations", state.settings.animations === false ? "off" : "on");
 
   const themeColor = document.querySelector('meta[name="theme-color"]');
   if (themeColor) themeColor.setAttribute("content", THEME_COLORS[theme]);

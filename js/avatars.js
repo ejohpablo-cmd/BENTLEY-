@@ -8,9 +8,9 @@ const FALLBACK_AVATAR =
   "data:image/svg+xml;utf8," +
   encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
-      '<rect width="64" height="64" fill="#C4B5FD"/>' +
+      '<rect width="64" height="64" fill="#E5E5E5"/>' +
       '<text x="32" y="44" font-family="Arial, sans-serif" font-size="34" font-weight="500" ' +
-      'text-anchor="middle" fill="#6D28D9">B</text></svg>'
+      'text-anchor="middle" fill="#000000">B</text></svg>'
   );
 
 // Swaps in the fallback picture if the image fails to load.

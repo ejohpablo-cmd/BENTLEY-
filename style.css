@@ -1,5 +1,5 @@
 /* =====================================================================
-   Axelvon styles: plum, lavender and off-white. One font (Fredoka), no shadows.
+   Axelvon styles: black and white. One font (Fredoka), no shadows.
    1. Theme        2. Base         3. Buttons       4. Sign in
    5. Layout       6. Avatars      7. Messages      8. Markdown
    9. Input box   10. Navigation  11. Cards & rows 12. History
@@ -20,41 +20,45 @@
   --vv-top: 0px; /* the part of the screen you can really see (without the keyboard), set by js/keyboard.js */
   --vv-height: 100dvh;
 
-  /* Plum, lavender and off-white (the same in both themes). */
-  --primary: #6d28d9; /* plum */
-  --primary-hover: #5b21b6;
-  --on-primary: #ffffff;
-  --lavender: #c4b5fd;
   --ok: #16a34a;
   --danger: #dc2640;
 }
 
+/* Black and white only. Light = black on white, Dark = white on black. */
 :root[data-theme="light"] {
-  --bg: #faf7ff; /* off-white */
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f1ecff;
-  --text: #14102b;
-  --text-2: #4b4570;
-  --muted: #7a7399;
-  --border: #ddd3fa;
-  --soft-border: #e6defc;
-  --primary-text: #6d28d9;
-  --overlay: rgba(20, 16, 43, 0.5);
-  --wood-shade: rgba(250, 247, 255, 0.72); /* soft veil over the chat wallpaper so replies stay readable */
+  --surface-2: #f2f2f2;
+  --text: #000000;
+  --text-2: #404040;
+  --muted: #737373;
+  --border: #d4d4d4;
+  --soft-border: #e5e5e5;
+  --primary: #000000; /* buttons and accents */
+  --primary-hover: #262626;
+  --on-primary: #ffffff; /* text on buttons */
+  --primary-text: #000000;
+  --lavender: #e5e5e5; /* soft grey fills (the old lavender) */
+  --overlay: rgba(0, 0, 0, 0.5);
+  --wood-shade: rgba(255, 255, 255, 0.72); /* soft veil over the chat wallpaper so replies stay readable */
 }
 
 :root[data-theme="dark"] {
-  --bg: #120d24;
-  --surface: #1c1535;
-  --surface-2: #281f4a;
-  --text: #f3eeff;
-  --text-2: #c9bfea;
-  --muted: #9488c0;
-  --border: #3a2f66;
-  --soft-border: #33295a;
-  --primary-text: #c4b5fd;
-  --overlay: rgba(8, 5, 20, 0.66);
-  --wood-shade: rgba(18, 13, 36, 0.74);
+  --bg: #000000;
+  --surface: #111111;
+  --surface-2: #1c1c1c;
+  --text: #ffffff;
+  --text-2: #d4d4d4;
+  --muted: #a3a3a3;
+  --border: #333333;
+  --soft-border: #262626;
+  --primary: #ffffff;
+  --primary-hover: #e5e5e5;
+  --on-primary: #000000;
+  --primary-text: #ffffff;
+  --lavender: #2e2e2e;
+  --overlay: rgba(0, 0, 0, 0.7);
+  --wood-shade: rgba(0, 0, 0, 0.74);
 }
 
 /* Chat bubble style (Settings > Chat bubble style). Only YOUR messages have a bubble;
@@ -103,6 +107,12 @@ input, textarea, select { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+/* Settings > Animations turned off */
+html[data-animations="off"] *, html[data-animations="off"] *::before, html[data-animations="off"] *::after { animation: none !important; transition: none !important; }
+
+/* Settings > Font size (everything is sized in rem, so this scales the whole app) */
+html[data-font="small"] { font-size: 14px; }
+html[data-font="large"] { font-size: 18px; }
 
 /* ---------- 3. Buttons ---------- */
 
@@ -299,7 +309,7 @@ html[data-tab="chat"] .app { background: transparent; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface);
+  background: transparent; /* no solid bar: the page shows through */
   border-bottom: 1px solid var(--border);
 }
 .topbar-id { display: flex; align-items: center; gap: 12px; }
@@ -377,6 +387,7 @@ html[data-tab="chat"] .welcome .bubble { border: 0; background: transparent; pad
 .messages > * { flex-shrink: 0; }
 
 .msg { display: flex; flex-direction: column; }
+.msg-time { margin-top: 4px; font-size: 0.6875rem; color: var(--muted); } /* Settings > Timestamps */
 
 .bubble {
   padding: 10px 14px;
@@ -588,7 +599,7 @@ html[data-tab="chat"] .welcome .bubble { border: 0; background: transparent; pad
   min-width: 0;
   min-height: 44px;
   max-height: 132px;
-  padding: 11px 16px 11px 0;
+  padding: 11px 8px 11px 0;
   border: 0;
   outline: none;
   background: transparent;
@@ -600,12 +611,13 @@ html[data-tab="chat"] .welcome .bubble { border: 0; background: transparent; pad
 .composer textarea::placeholder { color: var(--muted); }
 
 .send-btn {
-  width: 48px;
-  height: 48px;
+  width: 36px; /* sits inside the input box, on the right */
+  height: 36px;
+  margin: 4px 4px 4px 0;
   flex: none;
   display: grid;
   place-items: center;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 50%;
   background: var(--primary);
   color: var(--on-primary);
@@ -665,6 +677,7 @@ html[data-tab="chat"] .welcome .bubble { border: 0; background: transparent; pad
 .row-title { font-size: 0.9375rem; }
 .row-hint { font-size: 0.75rem; color: var(--muted); overflow-wrap: anywhere; }
 .row-value { font-size: 0.875rem; color: var(--text-2); text-align: right; }
+.row-soon { font-size: 0.75rem; color: var(--muted); padding: 4px 10px; border-radius: 999px; background: var(--lavender); }
 
 .select {
   min-height: 44px;
@@ -701,7 +714,7 @@ html[data-tab="chat"] .welcome .bubble { border: 0; background: transparent; pad
 }
 .switch::before { content: ""; position: absolute; inset: -6px -2px; } /* bigger touch area */
 .switch[aria-checked="true"] { background: var(--primary); }
-.switch[aria-checked="true"]::after { transform: translateX(22px); }
+.switch[aria-checked="true"]::after { transform: translateX(22px); background: var(--on-primary); }
 
 /* Longer text inside pop-up sheets (Privacy policy, Terms) */
 .legal { display: flex; flex-direction: column; gap: 10px; overflow-wrap: anywhere; font-size: 0.875rem; color: var(--text-2); }

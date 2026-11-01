@@ -10,9 +10,11 @@
 
     root.setAttribute("data-theme", theme);
     root.setAttribute("data-bubble", localStorage.getItem("bentley_bubble") || "rounded");
+    root.setAttribute("data-font", localStorage.getItem("bentley_font") || "medium");
+    root.setAttribute("data-animations", localStorage.getItem("bentley_animations") || "on");
 
     const themeColor = document.querySelector('meta[name="theme-color"]');
-    if (themeColor) themeColor.setAttribute("content", theme === "dark" ? "#120D24" : "#FAF7FF");
+    if (themeColor) themeColor.setAttribute("content", theme === "dark" ? "#000000" : "#FFFFFF");
   } catch (error) {
     // Storage is unavailable: keep the defaults written in index.html.
   }

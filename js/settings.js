@@ -1,6 +1,6 @@
-// The Settings page: Appearance, Axelvon, Connections, Chat, Privacy & security and About.
+// The Settings page: Axelvon, Connections, Appearance, Chat, Privacy & security and About.
 
-import { state, resetChat, DEFAULT_SETTINGS, LAST_CONVERSATION_KEY } from "./state.js";
+import { state, resetChat, DEFAULT_SETTINGS, LAST_CONVERSATION_KEY, APP_VERSION } from "./state.js";
 import { supabase, sendAppFeedback } from "./api.js";
 import { $, el, toast, regenerateEnabled, safeGet, safeSet, safeRemove } from "./helpers.js";
 import { confirmDialog, openModal } from "./modal.js";
@@ -17,15 +17,10 @@ const options = (...pairs) => pairs.map(([value, text]) => [value, text]);
 
 const SECTIONS = [
   {
-    title: "Appearance",
-    rows: [
-      { type: "select", key: "theme", label: "Theme", options: options(["light", "Light"], ["dark", "Dark"], ["system", "System"]) },
-      { type: "select", key: "bubble_style", label: "Chat bubble style", options: options(["rounded", "Rounded"], ["soft", "Soft"], ["square", "Square"]) },
-    ],
-  },
-  {
     title: "Axelvon",
     rows: [
+      { type: "select", key: "response_style", label: "Response style", options: options(["concise", "Concise"], ["balanced", "Balanced"], ["detailed", "Detailed"]) },
+      { type: "select", key: "creativity_level", label: "Creativity", options: options(["low", "Low"], ["medium", "Medium"], ["high", "High"]) },
       {
         type: "select",
         key: "personality",
@@ -46,12 +41,26 @@ const SECTIONS = [
     ],
   },
   {
+    title: "Appearance",
+    rows: [
+      { type: "select", key: "theme", label: "Theme", options: options(["light", "Light"], ["dark", "Dark"], ["system", "System"]) },
+      { type: "select", key: "font_size", label: "Font size", options: options(["small", "Small"], ["medium", "Medium"], ["large", "Large"]) },
+      { type: "toggle", key: "animations", label: "Animations" },
+      { type: "select", key: "bubble_style", label: "Chat bubble style", options: options(["rounded", "Rounded"], ["soft", "Soft"], ["square", "Square"]) },
+    ],
+  },
+  {
     title: "Chat",
-    rows: [{ type: "toggle", key: "regenerate", label: "Regenerate response", hint: "Show the button on Axelvon's latest reply" }],
+    rows: [
+      { type: "toggle", key: "enter_to_send", label: "Enter to send", hint: "Shift+Enter adds a new line" },
+      { type: "toggle", key: "show_timestamps", label: "Timestamps" },
+      { type: "toggle", key: "regenerate", label: "Regenerate response", hint: "Show the button on Axelvon's latest reply" },
+    ],
   },
   {
     title: "Privacy & security",
     rows: [
+      { type: "button", label: "Clear chats", buttonLabel: "Clear", danger: true, onClick: openClearChats },
       { type: "lock", label: "App lock", hint: "Ask for a PIN when the app opens" },
       { type: "button", label: "Data control", buttonLabel: "Open", onClick: openDataControl },
     ],
@@ -59,6 +68,8 @@ const SECTIONS = [
   {
     title: "About",
     rows: [
+      { type: "info", label: "About Axelvon", value: "AI Creative Companion" },
+      { type: "info", label: "Version", value: APP_VERSION },
       { type: "button", label: "Feedback", buttonLabel: "Send", onClick: openFeedback },
       { type: "button", label: "Privacy policy", buttonLabel: "Read", onClick: openPrivacyPolicy },
       { type: "button", label: "Terms", buttonLabel: "Read", onClick: openTerms },
@@ -72,9 +83,12 @@ const ALLOWED_VALUES = {
   theme: ["light", "dark", "system"],
   personality: ["friendly", "professional", "playful", "direct"],
   bubble_style: ["rounded", "soft", "square"],
+  response_style: ["concise", "balanced", "detailed"],
+  creativity_level: ["low", "medium", "high"],
+  font_size: ["small", "medium", "large"],
 };
 
-// The bubble style and the Regenerate button are kept on this phone only (not in the account).
+// The bubble style, font size, animations and the Regenerate button are kept on this phone only (not in the account).
 function getSetting(key) {
   if (key === "regenerate") return regenerateEnabled();
   return state.settings[key];
@@ -91,7 +105,13 @@ export async function loadSettings() {
     row = created.data;
   }
 
-  state.settings = { ...DEFAULT_SETTINGS, ...row, bubble_style: safeGet("bentley_bubble") || "rounded" };
+  state.settings = {
+    ...DEFAULT_SETTINGS,
+    ...row,
+    bubble_style: safeGet("bentley_bubble") || "rounded",
+    font_size: safeGet("bentley_font") || "medium",
+    animations: safeGet("bentley_animations") !== "off",
+  };
   // An older version of the app saved other values (for example personality "default"). Unknown ones fall back.
   for (const [key, allowed] of Object.entries(ALLOWED_VALUES)) {
     if (!allowed.includes(state.settings[key])) state.settings[key] = DEFAULT_SETTINGS[key];
@@ -111,8 +131,8 @@ async function updateSetting(key, value) {
     renderMessages({ keepScroll: true });
     return;
   }
-  if (key === "bubble_style") {
-    state.settings.bubble_style = value;
+  if (key === "bubble_style" || key === "font_size" || key === "animations") {
+    state.settings[key] = value;
     applyAppearance();
     return;
   }
@@ -120,12 +140,14 @@ async function updateSetting(key, value) {
   const previous = state.settings[key];
   state.settings[key] = value;
   if (key === "theme") applyAppearance();
+  if (key === "show_timestamps") renderMessages({ keepScroll: true });
 
   const { error } = await supabase.from("user_settings").update({ [key]: value }).eq("user_id", state.user.id);
   if (error) {
     console.error(error);
     state.settings[key] = previous; // put the old value back
     if (key === "theme") applyAppearance();
+    if (key === "show_timestamps") renderMessages({ keepScroll: true });
     renderSettings();
     toast("Couldn't save that setting.");
   }
@@ -189,7 +211,10 @@ function buildConnectionButton(row) {
   return button;
 }
 
+// Features that are not ready yet show a small "Soon" label; "info" rows only show a value.
 function buildRowControl(row) {
+  if (row.type === "soon") return el("span", "row-soon", "Soon");
+  if (row.type === "info") return el("span", "row-value", row.value);
   if (row.type === "select") return buildSelect(row);
   if (row.type === "toggle") return buildToggle(row);
   if (row.type === "lock") return buildLockButton();

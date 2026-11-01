@@ -10,6 +10,7 @@ let current = null; // { id, text, shown, step, onDone }
 let timer = null;
 
 function reducedMotion() {
+  if (document.documentElement.getAttribute("data-animations") === "off") return true; // Settings > Animations
   return Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 }
 

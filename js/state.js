@@ -13,6 +13,9 @@ export const DEFAULT_SETTINGS = {
   bubble_style: "rounded",
   memory_enabled: false,
   enter_to_send: true,
+  show_timestamps: false,
+  font_size: "medium", // kept on this phone only
+  animations: true, // kept on this phone only
 };
 
 export const state = {
